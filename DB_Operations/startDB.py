@@ -3,7 +3,6 @@ from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, cre
 from sqlalchemy.orm import sessionmaker
 
 from DB_Operations.entities.Base import Base
-from DB_Operations.entities.User import User
 import configparser
 
 

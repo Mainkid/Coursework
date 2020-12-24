@@ -156,9 +156,9 @@ class User(Base):
             self.smoking = personal.get('smoking')
             self.alcohol = personal.get('alcohol')
         self.relation_type = user.get('relation')
-        self.relation_partner_ID = user.get('relation_partner')
+        if user.get('relation_partner') is not None:
+            self.relation_partner_ID = user.get('relation_partner').get('id')
         self.Date_of_Collection = datetime.now()
-        print()
 
     #Доделать время!
 

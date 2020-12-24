@@ -13,11 +13,12 @@ from DB_Operations.entities.User_school import User_school
 from DB_Operations.entities.User_wall_posts import User_wall_posts
 from DB_Operations.entities.User_occupation import User_occupation
 from DB_Operations.entities.Wall_post_attachments import Wall_post_attachments
-from DB_Operations.entities.Wall_post_comments import Wall_post_comments
-from DB_Operations.entities.Wall_post_comment_attachments import Wall_post_comment_attachments
-from DB_Operations.entities.Wall_post_liked import Wall_post_liked
-from DB_Operations.entities.Wall_post_comment_liked import Wall_post_comment_liked
+from DB_Operations.entities.Object_comments import Object_comments
+from DB_Operations.entities.Object_comment_attachments import Object_comment_attachments
+from DB_Operations.entities.Object_liked import Object_liked
+from DB_Operations.entities.Object_comment_liked import Object_comment_liked
 from DB_Operations.entities.Wall_post_reposted import Wall_post_reposted
+from DB_Operations.entities.User_photos import User_photos
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.query import sql
@@ -82,7 +83,6 @@ class CRUD:
             new_university = User_university(user_id, i, universityList[i])
             session.add(new_university)
         #session.commit()
-        print()
 
     @staticmethod
     def insert_friends_into_table(user_id,friends_data,offset):
@@ -93,7 +93,6 @@ class CRUD:
             new_friend=User_friends(user_id, items[i])
             session.add(new_friend)
         #session.commit()
-        print()
 
     @staticmethod
     def insert_military_into_table(user_data):
@@ -107,7 +106,6 @@ class CRUD:
                 CRUD.add_military_id_into_table(militaryList[i].get('unit_id'), militaryList[i].get('unit'))
             session.add(new_military)
         # session.commit()
-        print()
 
     @staticmethod
     def check_military_id_in_table(military_id):
@@ -132,7 +130,6 @@ class CRUD:
         new_unit=Unit(military_id,title)
         session.add(new_unit)
         #session.commit()
-        print()
 
     @staticmethod
     def insert_relatives_into_table(user_data):
@@ -144,7 +141,6 @@ class CRUD:
             new_relative = User_relatives(user_id, i, relativeList[i])
             session.add(new_relative)
         # session.commit()
-        print()
 
     @staticmethod
     def insert_schools_into_table(user_data):
@@ -156,7 +152,6 @@ class CRUD:
             new_school = User_school(user_id, i, schoolList[i])
             session.add(new_school)
         # session.commit()
-        print()
 
     @staticmethod
     def check_user_in_db(checked_id):
@@ -194,19 +189,19 @@ class CRUD:
             session.add(new_attachment)
 
     @staticmethod
-    def add_comment_attachment_into_db(user_id,id_comment, wallpost_id, attachment_list):
+    def add_object_attachment_into_db(user_id,id_comment, wallpost_id, attachment_list, object_type):
         if attachment_list is None:
             return
         for i in range(0, len(attachment_list)):
             a_type = attachment_list[i].get('type')
             url = CRUD.get_attachment_url(attachment_list[i], a_type)
-            new_attachment = Wall_post_comment_attachments(user_id,id_comment, i, wallpost_id, attachment_list[i].get('type'), url)
+            new_attachment = Object_comment_attachments(user_id,id_comment, i, wallpost_id, attachment_list[i].get('type'), url,object_type)
             session.add(new_attachment)
 
     @staticmethod
-    def add_comment_into_db(user_id, wallpost_id, comment):
-        new_Comment=Wall_post_comments(user_id,wallpost_id,comment)
-        CRUD.add_comment_attachment_into_db(user_id,comment.get('id'),wallpost_id,comment.get('attachments'))
+    def add_object_comment_into_db(user_id, wallpost_id, comment, object_type):
+        new_Comment=Object_comments(user_id,wallpost_id,comment,object_type)
+        CRUD.add_object_attachment_into_db(user_id,comment.get('id'),wallpost_id,comment.get('attachments'),object_type)
         session.add(new_Comment)
         return
 
@@ -250,15 +245,15 @@ class CRUD:
             return ''
 
     @staticmethod
-    def insert_user_liked_post(user_liked_list,id,wallpost_id):
+    def insert_user_liked_object(user_liked_list,id,object_id,object_type):
         for i in range (0,len(user_liked_list)):
-            new_liked=Wall_post_liked(id,wallpost_id,user_liked_list[i])
+            new_liked=Object_liked(id,object_id,user_liked_list[i],object_type)
             session.add(new_liked)
 
     @staticmethod
-    def insert_user_liked_post_comment(user_liked_list,id,wallpost_id,comment_id):
+    def insert_user_liked_object_comment(user_liked_list,id,object_id,comment_id,object_type):
         for i in range (0,len(user_liked_list)):
-            new_liked=Wall_post_comment_liked(id,wallpost_id,user_liked_list[i], comment_id)
+            new_liked=Object_comment_liked(id,object_id,user_liked_list[i], comment_id,object_type)
             session.add(new_liked)
 
     @staticmethod
@@ -266,3 +261,9 @@ class CRUD:
         for i in range (0,len(user_reposted_list)):
             new_reposted=Wall_post_reposted(id,wallpost_id,user_reposted_list[i])
             session.add(new_reposted)
+
+    @staticmethod
+    def insert_user_photo_data(id, photo):
+        new_photo=User_photos(id, photo)
+        session.add(new_photo)
+

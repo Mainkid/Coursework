@@ -17,14 +17,14 @@ class Data_Collector:
        career, military, blacklisted, blacklisted_by_me, can_be_invited_group,counters
        """
     data: list
-    friends_data:list
+    friends_data: list
     wall_posts: list
-    albums: list
     photos: list
 
 
 
     def __init__(self, vk_api, version, user_id):
+        print('_______________________________')
         config = configparser.ConfigParser()  # создаём объекта парсера
         config.read(r"config.ini")  # читаем конфиг
         self.vk_api= vk_api
@@ -40,12 +40,15 @@ class Data_Collector:
                 CRUD.rollback_session()
                 return
             self.insert_wall_posts_into_DB(config)
+            if (not self.get_photos(config)):
+                CRUD.rollback_session()
+                return
+            self.insert_photos_into_DB(config)
             CRUD.commit_adding_user()
             print('New user added successfuly...')
         else:
             print('This user is already exists')
-        #self.get_user_albums(10)
-        #self.get_user_photos(10)
+
 
 
 
@@ -59,42 +62,27 @@ class Data_Collector:
             print(e)
             return False
         print('Pulling users data from id='+str(self.user_id))
-        self.push_user_data_into_db()
         return True
 
-
     def insert_friends_into_DB(self):
+        print('Adding users friends to the global query')
         for i in range(0, self.friends_data.get('count'), +5000):
             CRUD.insert_friends_into_table(self.user_id,self.friends_data, i)
         #___________ДОБАВИТЬ ДРУГА К ГЛОБАЛЬНОЙ ОЧЕРЕДИ_________________
 
-
-    #  Сначала нужно получить альбом!
     def get_user_wall_posts(self, amount_of_posts):
+        print('Pulling user wall posts...')
         try:
             self.wall_posts= self.vk_api.wall.get(owner_id=self.user_id, count=amount_of_posts, v=self.version)
         except vk.exceptions.VkAPIError as e:
             print('ErrorCode: ' + str(e.code))
             print(e)
             return False
-        print('Puling user wall posts...')
         return True
-
-    def get_user_albums (self, amount_of_albums):
-        self.albums = self.vk_api.photos.getAlbums(owner_id=self.user_id, count=amount_of_albums, v=self.version)
-        print('Puling user albums posts...')
-
-    def get_user_photos(self,  amount_of_photos):
-        for i in range(len(self.albums)):
-           # self.photos = self.vk_api.photos.get(owner_id=self.user_id, count=amount_of_photos, v=self.version, album_id=self.albums.items[i].id)
-            print('Puling user photos...')
-
-    def push_user_data_into_db(self):
-        print('Pushing')
 
     def insert_wall_posts_into_DB(self,config):
         wall_items_list=self.wall_posts.get('items')
-
+        print('Inserting users wall posts in DB...')
         for i in range(0, min(len(wall_items_list),100,int( config["wallposts"]["maxPosts"]))):
             CRUD.add_wall_post_into_db(self.user_id, wall_items_list[i])
             try:
@@ -105,41 +93,69 @@ class Data_Collector:
                 return False
             time.sleep(1)
 
-            self.add_new_comment_into_DB(wall_items_list[i].get('id'),commentary_list,config)
-            if (self.insert_post_liked_users(wall_items_list[i].get('id'))==False):
+            self.add_new_comment_into_DB(wall_items_list[i].get('id'),commentary_list,config, 'post')
+            if (self.insert_object_liked_users(wall_items_list[i].get('id'), 'post')==False):
                 return False
             self.insert_post_reposted_users(wall_items_list[i].get('id'))
 
         return True
 
-    def add_new_comment_into_DB(self,wallpost_id,commetary_list,config):
+    def add_new_comment_into_DB(self,object_id, commetary_list, config, object_type):
+        print('Adding comments for the referenced object...')
         comments=commetary_list.get('items')
         if comments is None:
             return
         for i in range (0,min(20,int(config["comments"]["maxComments"]),len(comments))):
-             CRUD.add_comment_into_db(self.user_id,wallpost_id,comments[i])
-             self.insert_comment_liked_users(wallpost_id,comments[i].get('id'))
+             CRUD.add_object_comment_into_db(self.user_id,object_id,comments[i],object_type)
+             self.insert_comment_liked_users(object_id,comments[i].get('id'),object_type)
              if (comments[i].get('thread') is not None):
-                self.add_new_comment_into_DB(wallpost_id, comments[i].get('thread'), config)
+                self.add_new_comment_into_DB(object_id, comments[i].get('thread'), config,object_type)
 
-    def insert_post_liked_users(self,wallpost_id):
-        liked_users_list=self.vk_api.likes.getList(type='post', owner_id=self.user_id, item_id=wallpost_id,v=self.version)
+    def insert_object_liked_users(self,object_id, type_of_obj):
+
+        liked_users_list=self.vk_api.likes.getList(type=type_of_obj, owner_id=self.user_id, item_id=object_id,v=self.version)
         time.sleep(1)
         if (len(liked_users_list.get('items'))>0):
-            CRUD.insert_user_liked_post(liked_users_list.get('items'), self.user_id, wallpost_id)
+            CRUD.insert_user_liked_object(liked_users_list.get('items'), self.user_id,object_id, type_of_obj)
             return True
         return False
 
-    def insert_comment_liked_users(self,wallpost_id,comment_id):
+    def insert_comment_liked_users(self,wallpost_id,comment_id,object_type):
         liked_users_list=self.vk_api.likes.getList(type='comment', owner_id=self.user_id, item_id=comment_id,v=self.version)
         time.sleep(1)
         if (len(liked_users_list.get('items')) > 0):
-            CRUD.insert_user_liked_post_comment(liked_users_list.get('items'),self.user_id,wallpost_id,comment_id)
+            CRUD.insert_user_liked_object_comment(liked_users_list.get('items'),self.user_id,wallpost_id,comment_id,object_type)
             return True
         return False
 
     def insert_post_reposted_users(self,wallpost_id):
         reposted_user_list=self.vk_api.wall.getReposts(owner_id=self.user_id, post_id=wallpost_id, v=self.version)
         time.sleep(1)
-        if (len(reposted_user_list('items'))>0):
+        if (len(reposted_user_list.get('items'))>0):
             CRUD.insert_user_reposted_post(reposted_user_list.get('items'), self.user_id, wallpost_id)
+
+    def get_photos(self,config):
+        print('Pulling users photos...')
+        try:
+            self.photos= self.vk_api.photos.getAll(owner_id=self.user_id, count=config["photos"]["maxPhotos"], v=self.version)
+        except vk.exceptions.VkAPIError as e:
+            print('ErrorCode: ' + str(e.code))
+            print(e)
+            return False
+        print('Pulling user photos...')
+        return True
+
+    def insert_photos_into_DB(self,config):
+        ('Adding photos into DB...')
+        photosList=self.photos.get('items')
+        for i in range(len(photosList)):
+            CRUD.insert_user_photo_data(self.user_id, photosList[i])
+            self.insert_object_liked_users(photosList[i].get('id'),'photo')
+            try:
+                commentary_list= self.vk_api.photos.getComments(owner_id=self.user_id, photo_id=photosList[i].get('id'),v=self.version, thread_items_count=config["comments"]["maxThreadItems"])
+            except vk.exceptions.VkAPIError as e:
+                print('ErrorCode: '+str(e.code))
+                print(e)
+                return False
+            time.sleep(1)
+            self.add_new_comment_into_DB(photosList[i].get('id'), commentary_list, config, 'photo')
