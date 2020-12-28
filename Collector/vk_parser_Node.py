@@ -16,7 +16,7 @@ class Node_Parser:
             return
         else:
             # Берем случайный токен || первый токен
-            self.token = '0d33c9280858a27d8f5a42f448f918f878a88c3d142a35246bbfc6f3fe34a2929dbbafec0d4144a55c988'
+            self.token = '1e95f60646ecbd7c77b29eb586c7bb3f3199167f4d4cafba52cbfa712aff8f732683c969b664b5cf32a39'
 
     def startSession(self):
         session = vk.Session(access_token=self.token)  # Начинаем сессию

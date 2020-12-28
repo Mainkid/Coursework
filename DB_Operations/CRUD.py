@@ -89,7 +89,7 @@ class CRUD:
         items=friends_data.get('items')
         if (items is None):
             return
-        for i in range(offset,friends_data.get('count')):
+        for i in range(offset, len(items)):
             new_friend=User_friends(user_id, items[i])
             session.add(new_friend)
         #session.commit()

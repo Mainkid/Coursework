@@ -18,7 +18,7 @@ def background_process_test():
     rec_depth=request.form.get('rec_depth')
     if(Web_server_operations.check_num(user_id_from_web) and Web_server_operations.check_num(rec_depth)):
         new_user_view=User_view(user_id_from_web, rec_depth)
-        message_handler.send_message_to_node(user_id_from_web)
+        message_handler.send_message_to_node(user_id_from_web,rec_depth)
     return render_template("index.html")
 
 app.run(host='0.0.0.0', debug = True)
