@@ -22,10 +22,11 @@ class Data_Collector:
     photos: list
 
 
+
     def __init__(self, vk_api, version, user_id,user_query):
         print('_______________________________')
         config = configparser.ConfigParser()  # создаём объекта парсера
-        config.read(r"config.ini")  # читаем конфиг
+        config.read(r"db_config.ini")  # читаем конфиг
         self.vk_api= vk_api
         self.version= version
         self.user_id= user_id

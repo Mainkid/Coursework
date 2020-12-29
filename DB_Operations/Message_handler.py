@@ -14,7 +14,7 @@ class Message_Handler:
 
     def get_message_from_web(self, user_query):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host='localhost'))
+            host='rabbitmq3'))
         channel = connection.channel()
         channel.queue_declare(queue='hello', durable=True)
         channel.basic_qos(prefetch_count=1)
@@ -29,4 +29,4 @@ class Message_Handler:
         data = json.loads(body)
 
         user_query.append(User_message(data['user_id'],data['rec_depth']))
-        print(" [x] Received %r" % (body,) )
+        print('Recieved')

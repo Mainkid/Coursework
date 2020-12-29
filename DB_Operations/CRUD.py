@@ -85,12 +85,13 @@ class CRUD:
         #session.commit()
 
     @staticmethod
-    def insert_friends_into_table(user_id,friends_data,offset):
+    def insert_friends_into_table(user_id,friends_data,offset,user_query):
         items=friends_data.get('items')
         if (items is None):
             return
         for i in range(offset, len(items)):
             new_friend=User_friends(user_id, items[i])
+            user_query.append(items[i])
             session.add(new_friend)
         #session.commit()
 

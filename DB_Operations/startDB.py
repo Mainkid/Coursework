@@ -8,7 +8,7 @@ import configparser
 
 
 config = configparser.ConfigParser()  # создаём объекта парсера
-config.read(r"config.ini")  # читаем конфиг
+config.read(r"db_config.ini")  # читаем конфиг
 
 cn_str='postgresql+psycopg2://'+config["postgres"]["user"]+':'+config["postgres"]["password"]+'@'+config["postgres"]["host"]+'/'+config["postgres"]["database"]
 # Чтение конфиг файла добавить

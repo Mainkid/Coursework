@@ -1,5 +1,5 @@
 import vk
-from Collector import data_collector
+from DB_Operations.Collector.data_collector import Data_Collector
 
 
 class Node_Parser:
@@ -24,5 +24,5 @@ class Node_Parser:
 
     def startPullingData(self, user_id,user_query):    #  Начинаем сбор данных
         print('Pulling data from ', user_id)
-        collector = data_collector.Data_Collector(self.vk_api, self.version, user_id,user_query) #Создаем каждый раз новый экземпляр
+        collector = Data_Collector(self.vk_api, self.version, user_id,user_query) #Создаем каждый раз новый экземпляр
 

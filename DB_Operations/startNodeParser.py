@@ -1,4 +1,4 @@
-from Collector import vk_parser_Node
+from DB_Operations.Collector import vk_parser_Node
 from DB_Operations.Message_handler import Message_Handler
 import time
 from multiprocessing import Process
@@ -14,12 +14,10 @@ NewParser.startSession()
 
 def start_collecting(user_query):
     while True:
-        NewParser.startPullingData(11)
         while len(user_query)>0:
-            NewParser.startPullingData(user_query[0].user_id)
+            NewParser.startPullingData(user_query[0].user_id,user_query)
             del user_query[0]
             time.sleep(0.5)
-
         time.sleep(5)
 
 
@@ -30,7 +28,7 @@ if (__name__ == '__main__'):
     message_handler = Message_Handler()
     p2 = Process(target=start_collecting, args=(user_query,))
     p2.start()
-    p1 = Process(target=message_handler.get_message_from_web,args=(user_query,) )
+    p1 = Process(target=message_handler.get_message_from_web, args=(user_query,) )
     p1.start()
     p2.join()
     p1.join()

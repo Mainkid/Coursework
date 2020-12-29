@@ -7,11 +7,6 @@ class Message_Handler:
 
 
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-            'localhost'))
-        self.channel = self.connection.channel()
-        self.channel.queue_delete(queue='hello')
-        self.channel.queue_declare(queue='hello', durable=True)
         print()
 
 
@@ -21,11 +16,13 @@ class Message_Handler:
             "rec_depth": rec_depth
         }
         msg=json.dumps(data)
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-            'localhost'))
-        self.channel.basic_publish(exchange='',
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
+              'rabbitmq3'))
+        channel = connection.channel()
+        channel.basic_publish(exchange='',
                               routing_key='hello',
                               body=msg, properties=pika.BasicProperties(
                          delivery_mode = 2, # make message persistent
                       ))
-        self.connection.close()
+        connection.close()
+        print('web_delivery')

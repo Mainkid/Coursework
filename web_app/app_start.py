@@ -2,6 +2,7 @@ from flask import Flask,render_template,request
 from web_app.Web_server_operations import Web_server_operations
 from web_app.User_view_class import User_view
 from web_app.Message_handler import Message_Handler
+import time
 
 app = Flask(__name__)
 
@@ -12,7 +13,7 @@ message_handler=Message_Handler()
 def index():
     return render_template("index.html")
 
-@app.route('/background_process_test', methods=['GET', 'POST'])
+@app.route('/background_process_test', methods=['POST'])
 def background_process_test():
     user_id_from_web = request.form.get('user_id')
     rec_depth=request.form.get('rec_depth')

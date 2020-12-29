@@ -1,4 +1,38 @@
 version: '3'
 services:
+  rabbitmq3:
+    container_name: rabbitMQ
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_ERLANG_COOCKIE: 'cookie'
+    volumes:
+      - ./rabbit_volume:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
   flask:
-    build: .
+    container_name: flask
+    build: web_app
+    environment:
+      - FLASK_APP=app_start.py
+    ports:
+      - "5000:5000"
+    depends_on:
+      - rabbitmq3
+  database:
+    container_name: postgres_DB
+    image: "postgres"
+    env_file:
+      ./Database/database.env
+    volumes:
+      - ./database_volume:/var/lib/postgresql/data/
+      - ./Database/1.sql:/docker-entrypoint-initdb.d/1.sql
+  node_parser:
+    container_name: node
+    build: ./DB_Operations
+    ports:
+      - "5432:5432"
+    depends_on:
+      - rabbitmq3
+      - database
+      - flask
+
