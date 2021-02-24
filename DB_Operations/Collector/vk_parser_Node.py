@@ -1,6 +1,7 @@
 import vk
 from DB_Operations.Collector.data_collector import Data_Collector
-
+from DB_Operations.Message_handler import Message_Handler
+import time
 
 class Node_Parser:
     vk_api:vk.API
@@ -9,20 +10,40 @@ class Node_Parser:
 
 
 
+    def get_token(self):
+        counter=0
+        while self.token=="":
+            if counter<10:
+                message_handler = Message_Handler()
+                self.token = message_handler.get_msg('token_query')
+                print('Trying to get token from server...')
+                time.sleep(5)
+                counter+=1
+            else:
+                print('OK, lets get some tokens from DB...')
+                message_handler.send_message('give_me_tokens','stat_query')
+                counter=0
+
+
     def __init__(self, is_new_user):
-        # Если is_new_User==TRUE, тогда присвоить значению токена новые токен из tokenList, иначе взять любой токен
-        if (is_new_user):
-            # Новый токен
-            return
-        else:
-            # Берем случайный токен || первый токен
-            self.token = '1e95f60646ecbd7c77b29eb586c7bb3f3199167f4d4cafba52cbfa712aff8f732683c969b664b5cf32a39'
+        self.get_token()
+        print('Token accepted!')
 
     def startSession(self):
-        session = vk.Session(access_token=self.token)  # Начинаем сессию
-        self.vk_api = vk.API(session)
+        message_handler = Message_Handler()
+        session_has_started=False
+        while not session_has_started:
+            try:
+                session = vk.Session(access_token=self.token)  # Начинаем сессию
+                self.vk_api = vk.API(session)
+                session_has_started=True
+            except:
+                print('Oops, seems to be a problem with authorisation... trying to change a token.')
+                message_handler.send_message(self.token,'token_query')
+                self.get_token()
 
-    def startPullingData(self, user_id,user_query):    #  Начинаем сбор данных
+
+    def startPullingData(self, user_id,rec_depth,user_query,service_msg, user_batch_query):    #  Начинаем сбор данных
         print('Pulling data from ', user_id)
-        collector = Data_Collector(self.vk_api, self.version, user_id,user_query) #Создаем каждый раз новый экземпляр
+        collector = Data_Collector(self.vk_api, self.version, user_id, user_batch_query,rec_depth,service_msg) #Создаем каждый раз новый экземпляр
 

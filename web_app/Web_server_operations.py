@@ -1,5 +1,7 @@
 class Web_server_operations:
 
+    success=0
+    fail=0
 
     @staticmethod
     def check_num(value):

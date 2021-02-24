@@ -1,38 +1,50 @@
 version: '3'
 services:
-  rabbitmq3:
-    container_name: rabbitMQ
+  rabbitmq_query:
+    container_name: rabbitMQ_server
     image: rabbitmq:3-management
     environment:
       RABBITMQ_ERLANG_COOCKIE: 'cookie'
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
     volumes:
       - ./rabbit_volume:/var/lib/rabbitmq
     ports:
       - "15672:15672"
+      - "5672:5672"
   flask:
-    container_name: flask
+    container_name: flask_front
     build: web_app
     environment:
       - FLASK_APP=app_start.py
     ports:
       - "5000:5000"
     depends_on:
-      - rabbitmq3
-  database:
-    container_name: postgres_DB
+      - rabbitmq_query
+  database_coursework:
+    container_name: coursework_DB
     image: "postgres"
     env_file:
       ./Database/database.env
     volumes:
       - ./database_volume:/var/lib/postgresql/data/
       - ./Database/1.sql:/docker-entrypoint-initdb.d/1.sql
+  database_web:
+    container_name: web_DB
+    image: "postgres"
+    env_file:
+      ./Web_Database/database.env
+    volumes:
+      - ./database_web_volume:/var/lib/postgresql/data/
+      - ./Web_Database/1.sql:/docker-entrypoint-initdb.d/1.sql
   node_parser:
-    container_name: node
+    container_name: node_collector
     build: ./DB_Operations
     ports:
       - "5432:5432"
     depends_on:
-      - rabbitmq3
-      - database
+      - rabbitmq_query
+      - database_web
+      - database_coursework
       - flask
 

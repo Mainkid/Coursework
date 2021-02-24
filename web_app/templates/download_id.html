@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+<header>
+
+       <div class="top-menu">
+         <ul>
+             <li><a href="index">Главная</a></li>
+             <li><a href="download_id" >Добавить ID</a></li>
+             <li><a href="download_tokens">Добавить токен</a></li>
+             <li><a href="stats">Статистика</a></li>
+         </ul>
+       </div>
+</header>
+</div>
+<body>
+
+
+{% if args["method"] == "POST" %}
+        {% for cat,msg in get_flashed_messages(True) %}
+            <div class="flash {{cat}}">{{msg}}</div>
+        {% endfor %}
+{% endif %}
+
+<form class="decor" action="{{ url_for('download_id') }}" method="POST" enctype="multipart/form-data">
+<div class="form-inner">
+<h3 align="center">Введите данные о пользователе</h3>
+
+<input type="number" name="user_id" placeholder="Id Пользователя"  min="0" oninvalid="setCustomValidity('Id должно содержать цифры от 0 до 9')"  onchange="try{setCustomValidity('')}catch(e){}" >
+<input type="number" name="rec_depth" placeholder="Глубина рекурсии" min="0" max="5" oninvalid="setCustomValidity('Значение глубины рекурсии должно лежать в пределах от 0 до 5')"  onchange="try{setCustomValidity('')}catch(e){}" >
+    <h3 align="center">Или </h3>
+<div class="input__wrapper">
+   <input name="file" type="file" name="file" id="input__file" class="input input__file" >
+   <label for="input__file" class="input__file-button">
+      <span class="input__file-icon-wrapper"><img class="input__file-icon" src="./static/download.png" alt="Выбрать файл" width="25"></span>
+      <span class="input__file-button-text">Выберите файл</span>
+   </label>
+</div>
+<input type="submit" value="Отправить">
+</div>
+
+
+    <script>
+    let inputs = document.querySelectorAll('.input__file');
+    Array.prototype.forEach.call(inputs, function (input) {
+      let label = input.nextElementSibling,
+        labelVal = label.querySelector('.input__file-button-text').innerText;
+
+      input.addEventListener('change', function (e) {
+        let countFiles = '';
+        if (this.files && this.files.length >= 1)
+          countFiles = this.files.length;
+
+        if (countFiles)
+          label.querySelector('.input__file-button-text').innerText = 'Файл добавлен!' ;
+        else
+          label.querySelector('.input__file-button-text').innerText = labelVal;
+      });
+    });
+</script>
+</form>
+
+
+
+
+
+</div>
+</body>
+</html>

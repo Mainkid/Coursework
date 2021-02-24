@@ -1,12 +1,22 @@
-<body>
+<html>
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
 <header>
-<form action="{{ url_for('background_process_test') }}" method="post" style="text-align: center">
-    <input type="text" name="user_id">
-    <input type="text" name="rec_depth">
-    <input type="submit" name="okbutton" value="OK">
-</form>
 
+       <div class="top-menu">
+         <ul>
+             <li><a href="index">Главная</a></li>
+             <li><a href="download_id" >Добавить ID</a></li>
+             <li><a href="download_tokens">Добавить токен</a></li>
+             <li><a href="stats">Статистика</a></li>
+         </ul>
+       </div>
 </header>
-<footer></footer>
-</body>
+</div>
 
+<body>
+<div class="imgd" align="center">
+<img src="./static/Diagram.png">
+</div>
+</body>
+</html>
