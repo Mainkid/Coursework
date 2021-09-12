@@ -3,7 +3,7 @@ from web_app.web_DB.entities.Telegram_id import Telegram_id
 from web_app.web_DB.startDB import startDB
 from web_app.Telegram_bot.Message_handler import Message_Handler
 from sqlalchemy.exc import SQLAlchemyError
-bot = telebot.TeleBot('1602230107:AAHSuqntjxTGXO734og9q6uXX_6cMXUrJPs')
+bot = telebot.TeleBot('1602230107:AAGcqmmLQN0zAvaSIBBk9mHtAKQQVUoqWhY')
 
 
 

@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.0
--- Dumped by pg_dump version 13.0
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
--- Started on 2021-02-23 19:42:28
+-- Started on 2021-09-11 19:09:59
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -18,47 +18,133 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
---
--- TOC entry 2996 (class 0 OID 41430)
--- Dependencies: 201
--- Data for Name: stats; Type: TABLE DATA; Schema: public; Owner: postgres
---
+SET default_tablespace = '';
 
-COPY public.stats (id, successfully, failed) FROM stdin;
-1	0	0
-\.
-
+SET default_table_access_method = heap;
 
 --
--- TOC entry 2995 (class 0 OID 41423)
+-- TOC entry 201 (class 1259 OID 24793)
+-- Name: stats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stats (
+    successfully integer NOT NULL,
+    failed integer NOT NULL,
+    id integer NOT NULL
+);
+
+
+ALTER TABLE public.stats OWNER TO postgres;
+
+--
+-- TOC entry 200 (class 1259 OID 24791)
+-- Name: stats_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.stats_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.stats_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3002 (class 0 OID 0)
 -- Dependencies: 200
--- Data for Name: telegram_users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Name: stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-COPY public.telegram_users ("user") FROM stdin;
-\.
+ALTER SEQUENCE public.stats_id_seq OWNED BY public.stats.id;
 
 
 --
--- TOC entry 2998 (class 0 OID 41471)
+-- TOC entry 204 (class 1259 OID 24811)
+-- Name: telegram_users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.telegram_users (
+    "user" integer NOT NULL
+);
+
+
+ALTER TABLE public.telegram_users OWNER TO postgres;
+
+--
+-- TOC entry 203 (class 1259 OID 24809)
+-- Name: telegram_users_user_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.telegram_users_user_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.telegram_users_user_seq OWNER TO postgres;
+
+--
+-- TOC entry 3003 (class 0 OID 0)
 -- Dependencies: 203
--- Data for Name: tokens; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Name: telegram_users_user_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-COPY public.tokens (token) FROM stdin;
-\.
+ALTER SEQUENCE public.telegram_users_user_seq OWNED BY public.telegram_users."user";
 
 
 --
--- TOC entry 3004 (class 0 OID 0)
--- Dependencies: 202
--- Name: stats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- TOC entry 202 (class 1259 OID 24803)
+-- Name: tokens; Type: TABLE; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.stats_id_seq', 45, true);
+CREATE TABLE public.tokens (
+    token text NOT NULL
+);
 
 
--- Completed on 2021-02-23 19:42:30
+ALTER TABLE public.tokens OWNER TO postgres;
+
+--
+-- TOC entry 2861 (class 2604 OID 24796)
+-- Name: stats id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stats ALTER COLUMN id SET DEFAULT nextval('public.stats_id_seq'::regclass);
+
+
+--
+-- TOC entry 2862 (class 2604 OID 24814)
+-- Name: telegram_users user; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.telegram_users ALTER COLUMN "user" SET DEFAULT nextval('public.telegram_users_user_seq'::regclass);
+
+
+--
+-- TOC entry 2864 (class 2606 OID 24798)
+-- Name: stats stats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stats
+    ADD CONSTRAINT stats_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2866 (class 2606 OID 24816)
+-- Name: telegram_users telegram_users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.telegram_users
+    ADD CONSTRAINT telegram_users_pkey PRIMARY KEY ("user");
+
+
+-- Completed on 2021-09-11 19:09:59
 
 --
 -- PostgreSQL database dump complete

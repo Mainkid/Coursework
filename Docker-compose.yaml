@@ -23,7 +23,7 @@ services:
       - rabbitmq_query
   database_coursework:
     container_name: coursework_DB
-    image: "postgres"
+    image: "postgres:12"
     env_file:
       ./Database/database.env
     volumes:
@@ -31,7 +31,7 @@ services:
       - ./Database/1.sql:/docker-entrypoint-initdb.d/1.sql
   database_web:
     container_name: web_DB
-    image: "postgres"
+    image: "postgres:12"
     env_file:
       ./Web_Database/database.env
     volumes:

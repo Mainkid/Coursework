@@ -28,7 +28,7 @@ def start_collecting(user_query,service_msg, user_batch_query):
 
 if (__name__ == '__main__'):
     # Старт сессии
-
+    time.sleep(180)
     m = multiprocessing.Manager()
     user_batch_query=m.list()
     user_query = m.list()

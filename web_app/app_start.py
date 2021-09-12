@@ -45,17 +45,17 @@ def check_consumers():
 
 message_handler=Message_Handler()
 if __name__=='__main__':
-    #message_handler = Message_Handler()
 
-    p2 = Process(target=check_consumers, args=())
-    p2.start()
+
+    #p2 = Process(target=check_consumers, args=())
+    #p2.start()
     p1 = Process(target=message_handler.recieving_messages, args=())
     p1.start()
     theproc1 = subprocess.Popen([sys.executable, "./Telegram_bot/run_bot.py"])
     theproc = subprocess.Popen([sys.executable, "web.py"])
     theproc.communicate()
 
-    p2.join()
+    #p2.join()
     p1.join()
 
 
