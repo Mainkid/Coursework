@@ -46,7 +46,7 @@ def check_consumers():
 message_handler=Message_Handler()
 if __name__=='__main__':
 
-
+    time.sleep(60)
     #p2 = Process(target=check_consumers, args=())
     #p2.start()
     p1 = Process(target=message_handler.recieving_messages, args=())

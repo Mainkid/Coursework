@@ -48,6 +48,7 @@ class Message_Handler:
                 msg=service_msg[0]
                 del service_msg[0]
                 self.send_message(msg,'stat_query')
+                print("==STATS SEND==")
             while len(user_batch_query)>0:
                 data = {
                     "user_id": user_batch_query[0].user_id,
