@@ -81,7 +81,7 @@ def stats():
     args = {"method": "GET"}
     x = startDB.session.query(Stats).get(1)
     labels = ['Успешно собрано','Не собрано' ]
-    values = [x.successfully, x.failed ]
+    values = [startDB.success, startDB.failed ]
     colors = [
         "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
         "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
@@ -103,6 +103,7 @@ def add_tokens_to_db(token_val):
 def check_token(token_val):
     try:
         get_token_by_query = startDB.session.query(Tokens.token).filter(Tokens.token == token_val).one()
+        startDB.session.commit()
         if get_token_by_query.token ==token_val:
             return True
         else:
@@ -132,6 +133,7 @@ def add_stats():
 def check_stats():
     try:
         get_stats= startDB.session.query(Stats.id).filter(Stats.id== 1).one()
+        startDB.session.commit()
         return True
     except IntegrityError as err:
         return False

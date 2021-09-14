@@ -6,7 +6,8 @@ import configparser
 class startDB:
 
     session= None
-
+    success=0
+    failed=0
     @staticmethod
     def connect():
         config = configparser.ConfigParser()  # создаём объекта парсера
