@@ -1,3 +1,5 @@
+import sys
+
 import vk
 from DB_Operations.CRUD import CRUD
 import configparser
@@ -70,6 +72,9 @@ class Data_Collector:
             self.data = self.vk_api.users.get(user_ids=self.user_id, name_case="Nom", fields=self.user_fields, v=self.version)  #Получаем данные пользователя
             self.friends_data=self.vk_api.friends.get(user_id=self.user_id, name_case="Nom", v=self.version)
         except vk.exceptions.VkAPIError as e:
+            if (e.code==5):
+                print("#######USER IS BLOCKED!########")
+                sys.exit()
             service_msg.append('FAIL')
             print('ErrorCode: ' + str(e.code))
             print(e)
