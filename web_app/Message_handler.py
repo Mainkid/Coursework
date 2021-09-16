@@ -8,6 +8,7 @@ from web_app.web_DB.entities.Tokens import Tokens
 from web_app.web_DB.startDB import startDB
 import configparser
 
+
 class Message_Handler:
 
     host = 0
@@ -51,11 +52,21 @@ class Message_Handler:
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print('BODY MSG: ', str(body))
         if str(body.decode("utf-8") )=='OK':
-            startDB.session.rollback()
+            try:
+                x = startDB.session.query(Stats).get(1)
+                print(x.successfully)
+                x.successfully += 1
+                startDB.session.commit()
+            except:
+                startDB.session.rollback()
             print('OK')
         elif str(body.decode("utf-8") )=='FAIL':
-            startDB.failed+=1
-
+            try:
+                x = startDB.session.query(Stats).get(1)
+                x.failed += 1
+                startDB.session.commit()
+            except:
+                startDB.session.rollback()
             print('Fail')
         elif str(body.decode("utf-8") )=='give_me_tokens':
             self.put_tokens_to_query()

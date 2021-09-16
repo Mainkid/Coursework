@@ -79,9 +79,12 @@ def download_id():
 @app.route("/stats", methods=["POST", "GET"])
 def stats():
     args = {"method": "GET"}
-    x = startDB.session.query(Stats).get(1)
-    labels = ['Успешно собрано','Не собрано' ]
-    values = [startDB.success, startDB.failed ]
+    try:
+        x = startDB.session.query(Stats).get(1)
+    except:
+        startDB.session.rollback()
+    labels = ['Успешно собрано', 'Не собрано']
+    values = [x.successfully, x.failed]
     colors = [
         "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
         "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
