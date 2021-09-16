@@ -70,7 +70,7 @@ class Message_Handler:
             print('Fail')
         elif str(body.decode("utf-8") )=='give_me_tokens':
             self.put_tokens_to_query()
-        time.sleep(0.5)
+        time.sleep(5)
 
     def send_message_token(self,file_bytes):
         return
