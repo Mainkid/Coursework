@@ -4,13 +4,17 @@ from web_app.User_view_class import User_view
 from web_app.Message_handler import Message_Handler
 from web_app.web_DB.entities.Stats import Stats
 from web_app.web_DB.startDB import startDB
+from web_app.web_DB.startCourseWorkDB import startCourseWorkDB
 from web_app.web_DB.entities.Tokens import Tokens
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import IntegrityError
+import psycopg2
+import configparser
 
 message_handler=Message_Handler()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'qfafsqetgl21375v'
+conn= None
 
 @app.route('/', methods=['POST','GET'])
 @app.route('/index', methods=['POST','GET'])
@@ -83,8 +87,21 @@ def stats():
         x = startDB.session.query(Stats).get(1)
     except:
         startDB.session.rollback()
-    labels = ['Успешно собрано', 'Не собрано']
-    values = [x.successfully, x.failed]
+    labels = ['Страничек собрано', 'Постов собрано','Комментариев собрано','Фотографий собрано']
+
+    cursor=conn.cursor()
+    x= cursor.execute('SELECT COUNT(*) FROM user_data_table')
+    x=cursor.fetchone()[0]
+    y=cursor.execute('SELECT COUNT(*) FROM user_wall_posts')
+    y=cursor.fetchone()[0]
+    z = cursor.execute('SELECT COUNT(*) FROM object_comments')
+    z = cursor.fetchone()[0]
+    w = cursor.execute('SELECT COUNT(*) FROM user_photos')
+    w = cursor.fetchone()[0]
+
+
+    cursor.close()
+    values = [x, y, z, w]
     colors = [
         "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
         "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
@@ -144,7 +161,14 @@ def check_stats():
         return False
 
 if __name__=='__main__':
-
+    config = configparser.ConfigParser()  # создаём объекта парсера
+    config.read(r"db_config.ini")  # читаем конфиг
+    if config["docker"]["using_docker"] == '1':
+        conn = psycopg2.connect(dbname=config["postgres_docker"]["database"], user=config["postgres_docker"]["user"],
+                                password=config["postgres_docker"]["password"], host=config["postgres_docker"]["host"])
+    else:
+        conn=psycopg2.connect(dbname=config["postgres"]["database"], user=config["postgres"]["user"],
+                        password=config["postgres"]["password"], host=config["postgres"]["host"])
     startDB.connect()
     qwe=123
     q=startDB.session
