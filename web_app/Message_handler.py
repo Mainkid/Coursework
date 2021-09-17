@@ -13,8 +13,7 @@ class Message_Handler:
 
     host = 0
     port = 0
-    connection= None
-    channel1 = None
+
 
     def __init__(self):
         config = configparser.ConfigParser()  # создаём объекта парсера
@@ -39,14 +38,13 @@ class Message_Handler:
     def recieving_messages(self):
         startDB.connect()
         self.put_tokens_to_query()
-        if self.connection == None:
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=self.host))
-        if self.channel1 == None:
-            self.channel1 = self.connection.channel()
-        self.channel1.queue_declare(queue='stat_query', durable=True)
-        self.channel1.basic_qos(prefetch_count=1)
-        self.channel1.basic_consume(
+
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue='stat_query', durable=True)
+        self.channel.basic_qos(prefetch_count=1)
+        self.channel.basic_consume(
             on_message_callback=lambda ch, method, properties, body: self.callback(body, ch, method),
             queue='stat_query')
         self.channel1.start_consuming()
