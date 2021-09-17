@@ -28,7 +28,7 @@ class Message_Handler:
     def recieving_messages(self):
         startDB.connect()
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
+            host=self.host, connection_attempts=10, heartbeat=60))
         channel = connection.channel()
         channel.queue_declare(queue='to_telegram', durable=True)
         channel.basic_qos(prefetch_count=1)
@@ -51,7 +51,7 @@ class Message_Handler:
 
     def send_message(self,msg,channel_name):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
+            host=self.host, connection_attempts=10, heartbeat=60))
         channel = connection.channel()
         channel.basic_publish(exchange='',
                               routing_key=channel_name,

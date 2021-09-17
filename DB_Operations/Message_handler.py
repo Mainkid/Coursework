@@ -24,7 +24,7 @@ class Message_Handler:
     def get_message_from_web(self, user_query, service_msg):
         self.self_init()
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
+            host=self.host, connection_attempts=10, heartbeat=60))
         channel = connection.channel()
         channel.queue_declare(queue='service', durable=True)
         channel.basic_qos(prefetch_count=1)
@@ -61,7 +61,7 @@ class Message_Handler:
 
     def send_message(self,msg,queue_name):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
+            host=self.host, connection_attempts=10, heartbeat=60))
         channel = connection.channel()
         channel.basic_publish(exchange='',
                               routing_key=queue_name,
@@ -72,7 +72,7 @@ class Message_Handler:
 
     def get_msg(self,query_name):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
+            host=self.host, connection_attempts=10, heartbeat=60))
         channel = connection.channel()
         channel.queue_declare(queue=query_name, durable=True)
         channel.basic_qos(prefetch_count=1)
