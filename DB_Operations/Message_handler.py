@@ -7,8 +7,7 @@ from DB_Operations.Collector.User_message import User_message
 class Message_Handler:
     host = 0
     port = 0
-    connection = None
-    channel1 = None
+
 
     def __init__(self):
         self.self_init()
@@ -25,16 +24,14 @@ class Message_Handler:
 
     def get_message_from_web(self, user_query, service_msg):
         self.self_init()
-        if self.connection== None:
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=self.host))
-        if self.channel1== None:
-            self.channel1 = self.connection.channel()
-        self.channel1.queue_declare(queue='service', durable=True)
-        self.channel1.basic_qos(prefetch_count=1)
-        self.channel1.basic_consume(on_message_callback=lambda ch, method, properties, body: self.callback(body, user_query,ch,method),
+        channel = connection.channel()
+        channel.queue_declare(queue='service', durable=True)
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(on_message_callback=lambda ch, method, properties, body: self.callback(body, user_query,ch,method),
                               queue='service')
-        self.channel1.start_consuming()
+        channel.start_consuming()
         while True:
             time.sleep(5)
 
@@ -64,13 +61,13 @@ class Message_Handler:
             time.sleep(5)
 
     def send_message(self,msg,queue_name):
-        if self.connection == None:
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=self.host))
-        if self.channel1== None:
-            self.channel1 = self.connection.channel()
-        self.channel1 = self.connection.channel()
-        self.channel1.basic_publish(exchange='',
+
+        channel = connection.channel()
+        channel = connection.channel()
+        channel.basic_publish(exchange='',
                               routing_key=queue_name,
                               body=msg, properties=pika.BasicProperties(
                 delivery_mode=2,  # make message persistent
@@ -78,21 +75,21 @@ class Message_Handler:
         #connection.close()
 
     def get_msg(self,query_name):
-        if self.connection == None:
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=self.host))
 
-        if self.channel1 == None:
-            self.channel1 = self.connection.channel()
-        self.channel1.queue_declare(queue=query_name, durable=True)
-        self.channel1.basic_qos(prefetch_count=1)
-        method_frame, header_frame, body = self.channel1.basic_get(queue = query_name)
+
+        channel = connection.channel()
+        channel.queue_declare(queue=query_name, durable=True)
+        channel.basic_qos(prefetch_count=1)
+        method_frame, header_frame, body = channel.basic_get(queue = query_name)
         if method_frame!=None:
             if method_frame.NAME == 'Basic.GetEmpty':
                 #connection.close()
                 return ""
             else:
-                self.channel1.basic_ack(delivery_tag=method_frame.delivery_tag)
+                channel.basic_ack(delivery_tag=method_frame.delivery_tag)
                 #connection.close()
         else:
             #connection.close()

@@ -41,13 +41,13 @@ class Message_Handler:
         connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=self.host))
 
-        self.channel = self.connection.channel()
-        self.channel.queue_declare(queue='stat_query', durable=True)
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(
+        channel = connection.channel()
+        channel.queue_declare(queue='stat_query', durable=True)
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(
             on_message_callback=lambda ch, method, properties, body: self.callback(body, ch, method),
             queue='stat_query')
-        self.channel1.start_consuming()
+        channel.start_consuming()
         return
 
     def callback(self, body, ch, method):
@@ -89,13 +89,13 @@ class Message_Handler:
 
     def send_message(self,msg,channel_name):
         print(self.host)
-        if self.connection == None:
-            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-                host=self.host))
-        if self.channel1 == None:
-            self.channel1 = self.connection.channel()
-        self.channel1.queue_declare(queue=channel_name, durable=True)
-        self.channel1.basic_publish(exchange='',
+
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host=self.host))
+
+        channel = connection.channel()
+        channel.queue_declare(queue=channel_name, durable=True)
+        channel.basic_publish(exchange='',
                               routing_key=channel_name,
                               body=msg, properties=pika.BasicProperties(
                 delivery_mode=2,  # make message persistent
