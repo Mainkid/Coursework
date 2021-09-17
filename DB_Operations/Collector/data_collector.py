@@ -59,7 +59,7 @@ class Data_Collector:
             CRUD.commit_adding_user()
             print('New user added successfuly...')
             data = 'OK'
-            service_msg.append(data)
+            #service_msg.append(data)
         else:
             print('This user is already exists')
 
@@ -75,7 +75,7 @@ class Data_Collector:
             if (e.code==5):
                 print("#######USER IS BLOCKED!########")
                 sys.exit()
-            service_msg.append('FAIL')
+            #service_msg.append('FAIL')
             print('ErrorCode: ' + str(e.code))
             print(e)
             return False

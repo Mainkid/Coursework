@@ -37,6 +37,7 @@ class CRUD:
 
     @staticmethod
     def insert_user_into_table(user_data):
+
         new_user= User(user_data)
         new_user_counters=Counters(user_data)
         startDB.session.add(new_user)
@@ -367,7 +368,11 @@ class CRUD:
 
     @staticmethod
     def commit_adding_user():
-        startDB.session.commit()
+        try:
+            startDB.session.commit()
+        except:
+            print("ERROR WHILE ADDING USER")
+            startDB.session.rollback()
 
     @staticmethod
     def rollback_session():
