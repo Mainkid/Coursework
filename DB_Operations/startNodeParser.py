@@ -23,7 +23,7 @@ def start_collecting(user_query,service_msg, user_batch_query):
             data = json.loads(msg)
             NewParser.startPullingData(data['user_id'],int(data['rec_depth']), user_query, service_msg,user_batch_query)
             time.sleep(0.5)
-        time.sleep(5)
+        #time.sleep(5)
 
 
 if (__name__ == '__main__'):
@@ -38,6 +38,8 @@ if (__name__ == '__main__'):
 
     p2 = Process(target=start_collecting, args=(user_query,service_msg, user_batch_query), daemon=True)
     p2.start()
+    p4 = Process(target=start_collecting, args=(user_query, service_msg, user_batch_query))
+    p4.start()
     p3 = Process(target=message_handler.send_service_message, args=(service_msg, user_batch_query))
     p3.start()
     p1 = Process(target=message_handler.get_message_from_web, args=(user_query, service_msg))
