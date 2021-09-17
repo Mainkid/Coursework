@@ -13,6 +13,7 @@ class Message_Handler:
 
     host = 0
     port = 0
+    connection= None
 
     def __init__(self):
         config = configparser.ConfigParser()  # создаём объекта парсера
@@ -37,9 +38,10 @@ class Message_Handler:
     def recieving_messages(self):
         startDB.connect()
         self.put_tokens_to_query()
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
-        channel = connection.channel()
+        if self.connection == None:
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=self.host))
+        channel = self.connection.channel()
         channel.queue_declare(queue='stat_query', durable=True)
         channel.basic_qos(prefetch_count=1)
         channel.basic_consume(
@@ -87,16 +89,17 @@ class Message_Handler:
 
     def send_message(self,msg,channel_name):
         print(self.host)
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
-        channel = connection.channel()
+        if self.connection == None:
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=self.host))
+        channel = self.connection.channel()
         channel.queue_declare(queue=channel_name, durable=True)
         channel.basic_publish(exchange='',
                               routing_key=channel_name,
                               body=msg, properties=pika.BasicProperties(
                 delivery_mode=2,  # make message persistent
             ))
-        connection.close()
+        #connection.close()
 
     def put_tokens_to_query(self):
         try:

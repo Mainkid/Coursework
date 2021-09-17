@@ -7,6 +7,7 @@ from DB_Operations.Collector.User_message import User_message
 class Message_Handler:
     host = 0
     port = 0
+    connection = None
 
     def __init__(self):
         self.self_init()
@@ -23,9 +24,10 @@ class Message_Handler:
 
     def get_message_from_web(self, user_query, service_msg):
         self.self_init()
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
-        channel = connection.channel()
+        if self.connection== None:
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=self.host))
+        channel = self.connection.channel()
         channel.queue_declare(queue='service', durable=True)
         channel.basic_qos(prefetch_count=1)
         channel.basic_consume(on_message_callback=lambda ch, method, properties, body: self.callback(body, user_query,ch,method),
@@ -60,32 +62,34 @@ class Message_Handler:
             time.sleep(5)
 
     def send_message(self,msg,queue_name):
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
-        channel = connection.channel()
+        if self.connection == None:
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=self.host))
+        channel = self.connection.channel()
         channel.basic_publish(exchange='',
                               routing_key=queue_name,
                               body=msg, properties=pika.BasicProperties(
                 delivery_mode=2,  # make message persistent
             ))
-        connection.close()
+        #connection.close()
 
     def get_msg(self,query_name):
-        connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host=self.host))
-        channel = connection.channel()
+        if self.connection == None:
+            self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+                host=self.host))
+        channel = self.connection.channel()
         channel.queue_declare(queue=query_name, durable=True)
         channel.basic_qos(prefetch_count=1)
         method_frame, header_frame, body = channel.basic_get(queue = query_name)
         if method_frame!=None:
             if method_frame.NAME == 'Basic.GetEmpty':
-                connection.close()
+                #connection.close()
                 return ""
             else:
                 channel.basic_ack(delivery_tag=method_frame.delivery_tag)
-                connection.close()
+                #connection.close()
         else:
-            connection.close()
+            #connection.close()
             return ""
         return body
 
