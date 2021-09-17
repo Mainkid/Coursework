@@ -33,12 +33,15 @@ if (__name__ == '__main__'):
     user_batch_query=m.list()
     user_query = m.list()
     service_msg=m.list()
+    user_batch_query2 = m.list()
+    user_query2 = m.list()
+    service_msg2 = m.list()
     message_handler = Message_Handler()
 
 
     p2 = Process(target=start_collecting, args=(user_query,service_msg, user_batch_query), daemon=True)
     p2.start()
-    p4 = Process(target=start_collecting, args=(user_query, service_msg, user_batch_query))
+    p4 = Process(target=start_collecting, args=(user_query2, service_msg2, user_batch_query2))
     p4.start()
     p3 = Process(target=message_handler.send_service_message, args=(service_msg, user_batch_query))
     p3.start()
