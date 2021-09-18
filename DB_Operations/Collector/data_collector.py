@@ -10,6 +10,7 @@ import vk.exceptions
 
 class Data_Collector:
 
+    token=""
     user_id=0
     vk_api:vk.API
     user_fields = """
@@ -79,6 +80,7 @@ class Data_Collector:
                 counter=0
 
     def get_new_vk_api(self):
+        self.get_token()
         message_handler = Message_Handler()
         session_has_started = False
         while not session_has_started:
