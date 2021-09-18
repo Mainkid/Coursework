@@ -37,6 +37,7 @@ class Node_Parser:
                 session = vk.Session(access_token=self.token)  # Начинаем сессию
                 self.vk_api = vk.API(session)
                 session_has_started=True
+
             except:
                 print('Oops, seems to be a problem with authorisation... trying to change a token.')
                 message_handler.send_message(self.token,'token_query')

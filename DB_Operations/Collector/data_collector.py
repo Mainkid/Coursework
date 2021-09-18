@@ -1,4 +1,5 @@
 import sys
+from DB_Operations.Message_handler import Message_Handler
 
 import vk
 from DB_Operations.CRUD import CRUD
@@ -63,8 +64,33 @@ class Data_Collector:
         else:
             print('This user is already exists')
 
+    def get_token(self):
+        counter=0
+        while self.token=="":
+            if counter<10:
+                message_handler = Message_Handler()
+                self.token = message_handler.get_msg('token_query')
+                print('Trying to get token from server...')
+                time.sleep(5)
+                counter+=1
+            else:
+                print('OK, lets get some tokens from DB...')
+                message_handler.send_message('give_me_tokens','stat_query')
+                counter=0
 
+    def get_new_vk_api(self):
+        message_handler = Message_Handler()
+        session_has_started = False
+        while not session_has_started:
+            try:
+                session = vk.Session(access_token=self.token)  # Начинаем сессию
+                self.vk_api = vk.API(session)
+                session_has_started = True
 
+            except:
+                print('Oops, seems to be a problem with authorisation... trying to change a token.')
+                message_handler.send_message(self.token, 'token_query')
+                self.get_token()
 
 
     def get_user_data(self,service_msg):
@@ -75,6 +101,8 @@ class Data_Collector:
             if (e.code==5):
                 print("#######USER IS BLOCKED!########")
                 sys.exit()
+            if (e.code==29):
+                self.get_new_vk_api()
             #service_msg.append('FAIL')
             print('ErrorCode: ' + str(e.code))
             print(e)
@@ -95,6 +123,8 @@ class Data_Collector:
         try:
             self.wall_posts= self.vk_api.wall.get(owner_id=self.user_id, count=amount_of_posts, v=self.version)
         except vk.exceptions.VkAPIError as e:
+            if (e.code==29):
+                self.get_new_vk_api()
             print('ErrorCode: ' + str(e.code))
             print(e)
             return False
@@ -108,6 +138,8 @@ class Data_Collector:
             try:
                 commentary_list= self.vk_api.wall.getComments(owner_id=self.user_id,post_id=wall_items_list[i].get('id'),v=self.version,thread_items_count=config["comments"]["maxThreadItems"])
             except vk.exceptions.VkAPIError as e:
+                if (e.code == 29):
+                    self.get_new_vk_api()
                 print('ErrorCode: '+str(e.code))
                 print(e)
                 return False
@@ -136,6 +168,8 @@ class Data_Collector:
             liked_users_list=self.vk_api.likes.getList(type=type_of_obj, owner_id=self.user_id, item_id=object_id,v=self.version)
             time.sleep(1)
         except vk.exceptions.VkAPIError as e:
+            if (e.code==29):
+                self.get_new_vk_api()
             print('ErrorCode: ' + str(e.code))
             print(e)
             return False
@@ -183,6 +217,8 @@ class Data_Collector:
             try:
                 commentary_list= self.vk_api.photos.getComments(owner_id=self.user_id, photo_id=photosList[i].get('id'),v=self.version, thread_items_count=config["comments"]["maxThreadItems"])
             except vk.exceptions.VkAPIError as e:
+                if (e.code == 29):
+                    self.get_new_vk_api()
                 print('ErrorCode: '+str(e.code))
                 print(e)
                 return False

@@ -42,7 +42,7 @@ class Message_Handler:
         time.sleep(2)
         #print('Recieved')
 
-    def send_service_message(self,service_msg, user_batch_query):
+    def send_service_message(self,service_msg, user_batch_query,user_batch_query2):
         while True:
             while len(service_msg)>0:
                 msg=service_msg[0]
@@ -56,6 +56,14 @@ class Message_Handler:
                 }
                 msg = json.dumps(data)
                 del user_batch_query[0]
+                self.send_message(msg, 'hello')
+            while len(user_batch_query2)>0:
+                data = {
+                    "user_id": user_batch_query2[0].user_id,
+                    "rec_depth": user_batch_query2[0].rec_depth
+                }
+                msg = json.dumps(data)
+                del user_batch_query2[0]
                 self.send_message(msg, 'hello')
             time.sleep(5)
 
