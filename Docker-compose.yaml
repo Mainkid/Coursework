@@ -3,6 +3,10 @@ services:
   rabbitmq_query:
     container_name: rabbitMQ_server
     image: rabbitmq:3-management
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
     environment:
       RABBITMQ_ERLANG_COOCKIE: 'cookie'
       RABBITMQ_DEFAULT_USER: 'guest'
@@ -14,6 +18,10 @@ services:
       - "5672:5672"
   flask:
     container_name: flask_front
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
     build: web_app
     environment:
       - FLASK_APP=app_start.py
@@ -24,6 +32,10 @@ services:
   database_coursework:
     container_name: coursework_DB
     image: "postgres:12"
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
     env_file:
       ./Database/database.env
     volumes:
@@ -32,6 +44,10 @@ services:
   database_web:
     container_name: web_DB
     image: "postgres:12"
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
     env_file:
       ./Web_Database/database.env
     volumes:
@@ -39,6 +55,11 @@ services:
       - ./Web_Database/1.sql:/docker-entrypoint-initdb.d/1.sql
   node_parser:
     container_name: node_collector
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "5"
+    restart: always
     build: ./DB_Operations
     ports:
       - "5432:5432"
@@ -47,4 +68,138 @@ services:
       - database_web
       - database_coursework
       - flask
-
+  node_parser2:
+    container_name: node_collector2
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5431:5431"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser3:
+    container_name: node_collector3
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5430:5430"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser4:
+    container_name: node_collector4
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5429:5429"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser5:
+    container_name: node_collector5
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5428:5428"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser6:
+    container_name: node_collector6
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5427:5427"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser7:
+    container_name: node_collector7
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5426:5426"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser8:
+    container_name: node_collector8
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5425:5425"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser9:
+    container_name: node_collector9
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5424:5424"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
+  node_parser10:
+    container_name: node_collector10
+    logging:
+      options:
+        max-size: "100M"
+        max-file: "1"
+    restart: always
+    build: ./DB_Operations
+    ports:
+      - "5423:5423"
+    depends_on:
+      - rabbitmq_query
+      - database_web
+      - database_coursework
+      - flask
